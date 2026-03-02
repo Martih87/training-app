@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training History</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div class="container admin-container">
+    <header>
+      <h1>📊 Training History</h1>
+      <a href="/" class="btn btn-secondary btn-sm">← Log Session</a>
+    </header>
+
+    <!-- Stats overview -->
+    <section class="card stats-row" id="stats-row"></section>
+
+    <!-- Filters -->
+    <section class="card filter-bar">
+      <div class="form-row">
+        <label for="filter-from">From</label>
+        <input type="date" id="filter-from" />
+        <label for="filter-to">To</label>
+        <input type="date" id="filter-to" />
+        <label for="filter-exercise">Exercise</label>
+        <select id="filter-exercise">
+          <option value="">All</option>
+        </select>
+        <button id="btn-filter" class="btn btn-primary btn-sm">Filter</button>
+      </div>
+    </section>
+
+    <!-- Weekly calendar heatmap -->
+    <section class="card">
+      <h2>Workout Calendar</h2>
+      <div id="calendar-heatmap" class="calendar-heatmap"></div>
+      <div class="heatmap-legend">
+        <span class="legend-label">Less</span>
+        <span class="heatmap-cell level-0"></span>
+        <span class="heatmap-cell level-1"></span>
+        <span class="heatmap-cell level-2"></span>
+        <span class="heatmap-cell level-3"></span>
+        <span class="heatmap-cell level-4"></span>
+        <span class="legend-label">More</span>
+      </div>
+    </section>
+
+    <!-- Exercise volume chart (simple bar) -->
+    <section class="card">
+      <h2>Volume per Exercise</h2>
+      <div id="volume-chart" class="volume-chart"></div>
+    </section>
+
+    <!-- Session list -->
+    <section class="card">
+      <h2>All Sessions</h2>
+      <div id="session-list"></div>
+    </section>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "training-app",
+  "version": "1.0.0",
+  "description": "Personal training session tracker",
+  "main": "dist/server.js",
+  "scripts": {
+    "build:server": "tsc -p tsconfig.json",
+    "build:client": "tsc public/app.ts --target ES2020 --lib ES2020,DOM,DOM.Iterable --module ES2020 --outDir public --strict --skipLibCheck && tsc public/admin.ts --target ES2020 --lib ES2020,DOM,DOM.Iterable --module ES2020 --outDir public --strict --skipLibCheck",
+    "build": "npm run build:server && npm run build:client",
+    "start": "node dist/server.js",
+    "dev": "npx ts-node src/server.ts",
+    "seed": "npx ts-node src/seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
