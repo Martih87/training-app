@@ -39,6 +39,17 @@ header a {
   text-decoration: none;
 }
 
+.back-link {
+  font-size: 0.8rem;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #5b8def;
+}
+
 .btn-sm {
   font-size: 0.8rem;
   padding: 0.4rem 0.8rem;

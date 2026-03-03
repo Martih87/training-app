@@ -7,7 +7,7 @@
  *         (or: node dist/seed.js  after build)
  */
 
-import { createSession, getAllSessions, ExerciseEntry } from "./db";
+import { createSession, getSessionsByProfile, ExerciseEntry } from "./db";
 
 // --- Presets (same as server.ts) ---
 
@@ -93,9 +93,10 @@ function generateWorkoutDates(start: Date, end: Date): string[] {
 // --- Main ---
 
 function main(): void {
-  const existing = getAllSessions();
+  const profileId = "martin";
+  const existing = getSessionsByProfile(profileId);
   if (existing.length > 1) {
-    console.log(`⚠️  Database already has ${existing.length} sessions. Skipping seed.`);
+    console.log(`⚠️  Database already has ${existing.length} sessions for Martin. Skipping seed.`);
     console.log("   Delete data/training.db first if you want to re-seed.");
     return;
   }
@@ -104,15 +105,15 @@ function main(): void {
   const end = new Date("2026-03-02");
   const dates = generateWorkoutDates(start, end);
 
-  console.log(`🌱 Seeding ${dates.length} workout sessions (Jan 1 → Mar 2)...`);
+  console.log(`🌱 Seeding ${dates.length} workout sessions for Martin (Jan 1 → Mar 2)...`);
 
   for (const date of dates) {
     const exercises = buildExercises();
-    createSession(date, exercises);
+    createSession(profileId, date, exercises);
   }
 
-  const total = getAllSessions().length;
-  console.log(`✅ Done! ${total} sessions in the database.`);
+  const total = getSessionsByProfile(profileId).length;
+  console.log(`✅ Done! ${total} sessions in the database for Martin.`);
 }
 
 main();

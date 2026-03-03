@@ -24,6 +24,20 @@ interface Session {
 let corePresets: ExercisePreset[] = [];
 let optionalPresets: ExercisePreset[] = [];
 
+// ── Profile ──────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const profileId = params.get("profile");
+
+if (!profileId) {
+  window.location.href = "/";
+}
+
+// Update admin link to pass profile
+const historyLink = document.getElementById("history-link") as HTMLAnchorElement;
+if (historyLink) {
+  historyLink.href = `/admin.html?profile=${profileId}`;
+}
+
 // ── DOM refs ─────────────────────────────────────
 const sessionDateInput = document.getElementById("session-date") as HTMLInputElement;
 const exerciseListDiv = document.getElementById("exercise-list") as HTMLDivElement;
@@ -151,7 +165,7 @@ btnSave.addEventListener("click", async () => {
     return;
   }
 
-  const res = await fetch("/api/sessions", {
+  const res = await fetch(`/api/profiles/${profileId}/sessions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ date, exercises }),
@@ -170,7 +184,7 @@ btnSave.addEventListener("click", async () => {
 
 // ── History ──────────────────────────────────────
 async function loadHistory(): Promise<void> {
-  const res = await fetch("/api/sessions");
+  const res = await fetch(`/api/profiles/${profileId}/sessions`);
   const sessions: Session[] = await res.json();
 
   if (sessions.length === 0) {
@@ -210,7 +224,7 @@ async function loadHistory(): Promise<void> {
 async function deleteSession(id: string): Promise<void> {
   if (!confirm("Delete this session?")) return;
 
-  const res = await fetch(`/api/sessions/${id}`, { method: "DELETE" });
+  const res = await fetch(`/api/profiles/${profileId}/sessions/${id}`, { method: "DELETE" });
   if (res.ok) {
     showToast("Session deleted");
     await loadHistory();

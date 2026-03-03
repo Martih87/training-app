@@ -28,10 +28,22 @@ const sessionListDiv = document.getElementById("session-list") as HTMLDivElement
 // ── State ────────────────────────────────────────
 let allSessions: Session[] = [];
 let filteredSessions: Session[] = [];
+// ── Profile ──────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const profileId = params.get("profile");
 
+if (!profileId) {
+  window.location.href = "/";
+}
+
+// Update log link to pass profile
+const logLink = document.getElementById("log-link") as HTMLAnchorElement;
+if (logLink) {
+  logLink.href = `/log.html?profile=${profileId}`;
+}
 // ── Init ─────────────────────────────────────────
 async function init(): Promise<void> {
-  const res = await fetch("/api/sessions");
+  const res = await fetch(`/api/profiles/${profileId}/sessions`);
   allSessions = await res.json();
   filteredSessions = allSessions;
 
@@ -240,7 +252,7 @@ function renderSessionList(): void {
 
 async function deleteSession(id: string): Promise<void> {
   if (!confirm("Delete this session?")) return;
-  const res = await fetch(`/api/sessions/${id}`, { method: "DELETE" });
+  const res = await fetch(`/api/profiles/${profileId}/sessions/${id}`, { method: "DELETE" });
   if (res.ok) {
     allSessions = allSessions.filter((s) => s.id !== id);
     applyFilters();

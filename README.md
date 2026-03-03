@@ -1,6 +1,6 @@
 # Training App
 
-Personal training session tracker built with Express and SQLite (`better-sqlite3`). Log workouts with exercises, sets, weights, and reps — then review them in the browser.
+Personal training session tracker built with Express and SQLite (`better-sqlite3`). Log workouts with exercises, sets, weights, and reps — then review them in the browser. Supports multiple user profiles.
 
 ## Tech Stack
 
@@ -59,7 +59,7 @@ To populate the database with realistic sample workouts (6 sessions/week from Ja
 npm run seed
 ```
 
-This generates sessions with the four core exercises (Benchpress, Bicep Curls, Lateral Raises, Ab Crunches) plus 1–3 random optional exercises per session, with slight weight variation for realism.
+This generates sessions for the **Martin** profile with the four core exercises (Benchpress, Bicep Curls, Lateral Raises, Ab Crunches) plus 1–3 random optional exercises per session, with slight weight variation for realism.
 
 ## Project Structure
 
@@ -67,12 +67,13 @@ This generates sessions with the four core exercises (Benchpress, Bicep Curls, L
 ├── data/
 │   └── training.db         # SQLite database (auto-created)
 ├── public/                  # Static frontend files
-│   ├── index.html           # Main app UI
-│   ├── admin.html           # Admin panel
+│   ├── index.html           # Landing page (profile selector)
+│   ├── log.html             # Session logging UI
+│   ├── admin.html           # Training history / stats
 │   ├── style.css
 │   ├── admin.css
-│   ├── app.ts / app.js      # Client-side logic
-│   └── admin.ts / admin.js  # Admin client-side logic
+│   ├── app.ts / app.js      # Client-side logic (log page)
+│   └── admin.ts / admin.js  # Client-side logic (history page)
 ├── src/
 │   ├── db.ts                # Database setup, schema & queries
 │   ├── seed.ts              # Seed script for sample data
@@ -83,13 +84,28 @@ This generates sessions with the four core exercises (Benchpress, Bicep Curls, L
 
 ## API Endpoints
 
-| Method   | Path                | Description              |
-| -------- | ------------------- | ------------------------ |
-| `GET`    | `/api/exercises`    | List exercise presets    |
-| `GET`    | `/api/sessions`     | List all sessions (desc) |
-| `GET`    | `/api/sessions/:id` | Get a single session     |
-| `POST`   | `/api/sessions`     | Create a new session     |
-| `DELETE` | `/api/sessions/:id` | Delete a session         |
+### Profiles
+
+| Method | Path                 | Description           |
+| ------ | -------------------- | --------------------- |
+| `GET`  | `/api/profiles`      | List all profiles     |
+| `GET`  | `/api/profiles/:id`  | Get a single profile  |
+| `POST` | `/api/profiles`      | Create a new profile  |
+
+### Exercises
+
+| Method | Path             | Description           |
+| ------ | ---------------- | --------------------- |
+| `GET`  | `/api/exercises` | List exercise presets  |
+
+### Sessions (scoped to profile)
+
+| Method   | Path                                    | Description              |
+| -------- | --------------------------------------- | ------------------------ |
+| `GET`    | `/api/profiles/:profileId/sessions`     | List sessions (desc)     |
+| `GET`    | `/api/profiles/:profileId/sessions/:id` | Get a single session     |
+| `POST`   | `/api/profiles/:profileId/sessions`     | Create a new session     |
+| `DELETE` | `/api/profiles/:profileId/sessions/:id` | Delete a session         |
 
 ## NPM Scripts
 
