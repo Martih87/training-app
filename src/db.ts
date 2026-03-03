@@ -23,7 +23,10 @@ export interface Session {
 
 export interface Profile {
   id: string;
+  googleId: string;
   name: string;
+  email: string;
+  picture: string;
   createdAt: string;
 }
 
@@ -46,7 +49,10 @@ db.pragma("foreign_keys = ON");
 db.exec(`
   CREATE TABLE IF NOT EXISTS profiles (
     id         TEXT PRIMARY KEY,
+    google_id  TEXT UNIQUE NOT NULL,
     name       TEXT NOT NULL,
+    email      TEXT NOT NULL DEFAULT '',
+    picture    TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -74,39 +80,43 @@ db.exec(`
     ON sessions(profile_id);
 `);
 
-// --- Seed default profile ---
+// --- Migration: add google columns to existing profiles ---
 
-const defaultProfileId = "martin";
-const ensureDefaultProfile = db.prepare(
-  `INSERT OR IGNORE INTO profiles (id, name) VALUES (?, ?)`
-);
-ensureDefaultProfile.run(defaultProfileId, "Martin");
+const profileColumns = db.pragma("table_info(profiles)") as { name: string }[];
+const hasGoogleId = profileColumns.some((c) => c.name === "google_id");
 
-// --- Migration: add profile_id to existing sessions ---
-
-// Check if sessions table has profile_id column
-const columns = db.pragma("table_info(sessions)") as { name: string }[];
-const hasProfileId = columns.some((c) => c.name === "profile_id");
-
-if (!hasProfileId) {
-  db.exec(`ALTER TABLE sessions ADD COLUMN profile_id TEXT REFERENCES profiles(id) ON DELETE CASCADE`);
-  db.exec(`UPDATE sessions SET profile_id = '${defaultProfileId}' WHERE profile_id IS NULL`);
-  db.exec(`CREATE INDEX IF NOT EXISTS idx_sessions_profile ON sessions(profile_id)`);
+if (!hasGoogleId) {
+  db.exec(`ALTER TABLE profiles ADD COLUMN google_id TEXT DEFAULT ''`);
+  db.exec(`ALTER TABLE profiles ADD COLUMN email TEXT DEFAULT ''`);
+  db.exec(`ALTER TABLE profiles ADD COLUMN picture TEXT DEFAULT ''`);
+  // Backfill existing profiles with a placeholder google_id
+  db.exec(`UPDATE profiles SET google_id = id WHERE google_id = '' OR google_id IS NULL`);
 }
+
+// Create unique index on google_id (after migration ensures column exists)
+db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_profiles_google ON profiles(google_id)`);
 
 // --- Prepared statements ---
 
 // Profiles
 const insertProfile = db.prepare(
-  `INSERT INTO profiles (id, name) VALUES (?, ?)`
+  `INSERT INTO profiles (id, google_id, name, email, picture) VALUES (?, ?, ?, ?, ?)`
 );
 
 const selectAllProfiles = db.prepare(
-  `SELECT id, name, created_at FROM profiles ORDER BY created_at`
+  `SELECT id, google_id, name, email, picture, created_at FROM profiles ORDER BY created_at`
 );
 
 const selectProfileById = db.prepare(
-  `SELECT id, name, created_at FROM profiles WHERE id = ?`
+  `SELECT id, google_id, name, email, picture, created_at FROM profiles WHERE id = ?`
+);
+
+const selectProfileByGoogleId = db.prepare(
+  `SELECT id, google_id, name, email, picture, created_at FROM profiles WHERE google_id = ?`
+);
+
+const updateProfileStmt = db.prepare(
+  `UPDATE profiles SET name = ?, email = ?, picture = ? WHERE id = ?`
 );
 
 // Sessions
@@ -140,21 +150,61 @@ const deleteSessionStmt = db.prepare(
 
 // --- Public API: Profiles ---
 
+interface ProfileRow {
+  id: string;
+  google_id: string;
+  name: string;
+  email: string;
+  picture: string;
+  created_at: string;
+}
+
+function rowToProfile(row: ProfileRow): Profile {
+  return {
+    id: row.id,
+    googleId: row.google_id,
+    name: row.name,
+    email: row.email,
+    picture: row.picture,
+    createdAt: row.created_at,
+  };
+}
+
 export function getAllProfiles(): Profile[] {
-  return selectAllProfiles.all() as Profile[];
+  const rows = selectAllProfiles.all() as ProfileRow[];
+  return rows.map(rowToProfile);
 }
 
 export function getProfile(id: string): Profile | undefined {
-  const row = selectProfileById.get(id) as { id: string; name: string; created_at: string } | undefined;
+  const row = selectProfileById.get(id) as ProfileRow | undefined;
   if (!row) return undefined;
-  return { id: row.id, name: row.name, createdAt: row.created_at };
+  return rowToProfile(row);
+}
+
+export function getProfileByGoogleId(googleId: string): Profile | undefined {
+  const row = selectProfileByGoogleId.get(googleId) as ProfileRow | undefined;
+  if (!row) return undefined;
+  return rowToProfile(row);
+}
+
+export function upsertGoogleProfile(googleId: string, name: string, email: string, picture: string): Profile {
+  const existing = getProfileByGoogleId(googleId);
+  if (existing) {
+    // Update name/email/picture in case they changed
+    updateProfileStmt.run(name, email, picture, existing.id);
+    return getProfile(existing.id)!;
+  }
+  // Create new profile
+  const id = googleId; // Use Google sub ID as profile ID
+  insertProfile.run(id, googleId, name, email, picture);
+  return getProfile(id)!;
 }
 
 export function createProfile(name: string): Profile {
   const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   const existing = selectProfileById.get(id);
   if (existing) throw new Error(`Profile "${name}" already exists`);
-  insertProfile.run(id, name);
+  insertProfile.run(id, id, name, "", "");
   return getProfile(id)!;
 }
 

@@ -11,9 +11,12 @@
     <header>
       <div>
         <h1>🏋️ Training Log</h1>
-        <a href="/" class="back-link" id="back-link">← Switch profile</a>
+        <span class="back-link" id="user-info"></span>
       </div>
-      <a href="/admin.html" id="history-link" class="btn btn-secondary btn-sm">📊 History</a>
+      <div>
+        <a href="/admin.html" class="btn btn-secondary btn-sm">📊 History</a>
+        <button class="btn btn-secondary btn-sm" onclick="signOut()">Sign out</button>
+      </div>
     </header>
 
     <!-- NEW SESSION FORM -->

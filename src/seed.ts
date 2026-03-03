@@ -7,7 +7,7 @@
  *         (or: node dist/seed.js  after build)
  */
 
-import { createSession, getSessionsByProfile, ExerciseEntry } from "./db";
+import { createSession, getSessionsByProfile, upsertGoogleProfile, ExerciseEntry } from "./db";
 
 // --- Presets (same as server.ts) ---
 
@@ -93,7 +93,10 @@ function generateWorkoutDates(start: Date, end: Date): string[] {
 // --- Main ---
 
 function main(): void {
-  const profileId = "martin";
+  // Create a seed profile (will be linked to Google account on first sign-in)
+  const seedProfile = upsertGoogleProfile("seed-martin", "Martin", "", "");
+  const profileId = seedProfile.id;
+
   const existing = getSessionsByProfile(profileId);
   if (existing.length > 1) {
     console.log(`⚠️  Database already has ${existing.length} sessions for Martin. Skipping seed.`);

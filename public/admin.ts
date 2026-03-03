@@ -28,44 +28,51 @@ const sessionListDiv = document.getElementById("session-list") as HTMLDivElement
 // ── State ────────────────────────────────────────
 let allSessions: Session[] = [];
 let filteredSessions: Session[] = [];
-// ── Profile ──────────────────────────────────────────────
-const params = new URLSearchParams(window.location.search);
-const profileId = params.get("profile");
 
-if (!profileId) {
-  window.location.href = "/";
-}
-
-// Update log link to pass profile
-const logLink = document.getElementById("log-link") as HTMLAnchorElement;
-if (logLink) {
-  logLink.href = `/log.html?profile=${profileId}`;
-}
 // ── Init ─────────────────────────────────────────
 async function init(): Promise<void> {
-  const res = await fetch(`/api/profiles/${profileId}/sessions`);
-  allSessions = await res.json();
-  filteredSessions = allSessions;
+  try {
+    // Check auth — redirect to sign-in if not authenticated
+    const authRes = await fetch("/api/auth/me");
+    if (!authRes.ok) {
+      window.location.replace("/");
+      return;
+    }
+    const profile = await authRes.json();
 
-  // Set default filter range
-  if (allSessions.length > 0) {
-    filterFrom.value = allSessions[allSessions.length - 1].date;
-    filterTo.value = allSessions[0].date;
+    // Show profile name in header
+    const userInfo = document.getElementById("user-info");
+    if (userInfo) {
+      userInfo.textContent = profile.name;
+    }
+
+    const res = await fetch("/api/sessions");
+    allSessions = await res.json();
+    filteredSessions = allSessions;
+
+    // Set default filter range
+    if (allSessions.length > 0) {
+      filterFrom.value = allSessions[allSessions.length - 1].date;
+      filterTo.value = allSessions[0].date;
+    }
+
+    // Populate exercise filter dropdown
+    const exerciseNames = new Set<string>();
+    allSessions.forEach((s) => s.exercises.forEach((e) => exerciseNames.add(e.name)));
+    Array.from(exerciseNames)
+      .sort()
+      .forEach((name) => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        filterExercise.appendChild(opt);
+      });
+
+    render();
+  } catch {
+    window.location.replace("/");
+    return;
   }
-
-  // Populate exercise filter dropdown
-  const exerciseNames = new Set<string>();
-  allSessions.forEach((s) => s.exercises.forEach((e) => exerciseNames.add(e.name)));
-  Array.from(exerciseNames)
-    .sort()
-    .forEach((name) => {
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      filterExercise.appendChild(opt);
-    });
-
-  render();
 }
 
 btnFilter.addEventListener("click", () => {
@@ -252,7 +259,7 @@ function renderSessionList(): void {
 
 async function deleteSession(id: string): Promise<void> {
   if (!confirm("Delete this session?")) return;
-  const res = await fetch(`/api/profiles/${profileId}/sessions/${id}`, { method: "DELETE" });
+  const res = await fetch(`/api/sessions/${id}`, { method: "DELETE" });
   if (res.ok) {
     allSessions = allSessions.filter((s) => s.id !== id);
     applyFilters();
@@ -262,6 +269,13 @@ async function deleteSession(id: string): Promise<void> {
 
 // Make available globally for onclick
 (window as any).deleteSession = deleteSession;
+
+// ── Sign out ─────────────────────────────────────
+async function signOut(): Promise<void> {
+  await fetch("/api/auth/signout", { method: "POST" });
+  window.location.href = "/";
+}
+(window as any).signOut = signOut;
 
 // ── Boot ─────────────────────────────────────────
 init();

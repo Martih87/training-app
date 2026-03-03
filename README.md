@@ -7,12 +7,38 @@ Personal training session tracker built with Express and SQLite (`better-sqlite3
 - **Runtime:** Node.js / TypeScript
 - **Server:** Express 5
 - **Database:** SQLite via `better-sqlite3` (WAL mode)
+- **Auth:** Google Sign-In (Identity Services)
 - **Frontend:** Vanilla HTML / CSS / JS
 
 ## Prerequisites
 
 - Node.js ≥ 18
 - npm
+- A **Google Cloud OAuth 2.0 Client ID** (see below)
+
+## Google Sign-In Setup
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a project (or select an existing one)
+3. Navigate to **APIs & Services → Credentials**
+4. Click **Create Credentials → OAuth 2.0 Client ID**
+5. Set the application type to **Web application**
+6. Under **Authorized JavaScript origins**, add:
+   - `http://localhost:3000` (for local dev)
+   - Your production URL if applicable
+7. Copy the **Client ID**
+
+Set the Client ID as an environment variable:
+
+```bash
+export GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+```
+
+Or pass it inline when starting the server:
+
+```bash
+GOOGLE_CLIENT_ID="your-client-id" npm run dev
+```
 
 ## Getting Started
 
@@ -67,7 +93,7 @@ This generates sessions for the **Martin** profile with the four core exercises 
 ├── data/
 │   └── training.db         # SQLite database (auto-created)
 ├── public/                  # Static frontend files
-│   ├── index.html           # Landing page (profile selector)
+│   ├── index.html           # Landing page (Google Sign-In)
 │   ├── log.html             # Session logging UI
 │   ├── admin.html           # Training history / stats
 │   ├── style.css
@@ -84,13 +110,14 @@ This generates sessions for the **Martin** profile with the four core exercises 
 
 ## API Endpoints
 
-### Profiles
+### Auth
 
-| Method | Path                 | Description           |
-| ------ | -------------------- | --------------------- |
-| `GET`  | `/api/profiles`      | List all profiles     |
-| `GET`  | `/api/profiles/:id`  | Get a single profile  |
-| `POST` | `/api/profiles`      | Create a new profile  |
+| Method | Path                | Description                        |
+| ------ | ------------------- | ---------------------------------- |
+| `GET`  | `/api/auth/config`  | Get Google Client ID for frontend  |
+| `POST` | `/api/auth/google`  | Exchange Google credential for session |
+| `GET`  | `/api/auth/me`      | Get the signed-in user's profile   |
+| `POST` | `/api/auth/signout` | Clear session cookie               |
 
 ### Exercises
 
@@ -98,14 +125,14 @@ This generates sessions for the **Martin** profile with the four core exercises 
 | ------ | ---------------- | --------------------- |
 | `GET`  | `/api/exercises` | List exercise presets  |
 
-### Sessions (scoped to profile)
+### Sessions (auth-protected, scoped to signed-in user)
 
-| Method   | Path                                    | Description              |
-| -------- | --------------------------------------- | ------------------------ |
-| `GET`    | `/api/profiles/:profileId/sessions`     | List sessions (desc)     |
-| `GET`    | `/api/profiles/:profileId/sessions/:id` | Get a single session     |
-| `POST`   | `/api/profiles/:profileId/sessions`     | Create a new session     |
-| `DELETE` | `/api/profiles/:profileId/sessions/:id` | Delete a session         |
+| Method   | Path                | Description              |
+| -------- | ------------------- | ------------------------ |
+| `GET`    | `/api/sessions`     | List sessions (desc)     |
+| `GET`    | `/api/sessions/:id` | Get a single session     |
+| `POST`   | `/api/sessions`     | Create a new session     |
+| `DELETE` | `/api/sessions/:id` | Delete a session         |
 
 ## NPM Scripts
 

@@ -24,20 +24,6 @@ interface Session {
 let corePresets: ExercisePreset[] = [];
 let optionalPresets: ExercisePreset[] = [];
 
-// ── Profile ──────────────────────────────────────
-const params = new URLSearchParams(window.location.search);
-const profileId = params.get("profile");
-
-if (!profileId) {
-  window.location.href = "/";
-}
-
-// Update admin link to pass profile
-const historyLink = document.getElementById("history-link") as HTMLAnchorElement;
-if (historyLink) {
-  historyLink.href = `/admin.html?profile=${profileId}`;
-}
-
 // ── DOM refs ─────────────────────────────────────
 const sessionDateInput = document.getElementById("session-date") as HTMLInputElement;
 const exerciseListDiv = document.getElementById("exercise-list") as HTMLDivElement;
@@ -47,6 +33,25 @@ const historyListDiv = document.getElementById("history-list") as HTMLDivElement
 
 // ── Init ─────────────────────────────────────────
 async function init(): Promise<void> {
+  // Check auth — redirect to sign-in if not authenticated
+  try {
+    const authRes = await fetch("/api/auth/me");
+    if (!authRes.ok) {
+      window.location.replace("/");
+      return;
+    }
+    const profile = await authRes.json();
+
+    // Show profile name in header
+    const userInfo = document.getElementById("user-info");
+    if (userInfo) {
+      userInfo.textContent = profile.name;
+    }
+  } catch {
+    window.location.replace("/");
+    return;
+  }
+
   // Set today as default date
   sessionDateInput.value = new Date().toISOString().slice(0, 10);
 
@@ -165,7 +170,7 @@ btnSave.addEventListener("click", async () => {
     return;
   }
 
-  const res = await fetch(`/api/profiles/${profileId}/sessions`, {
+  const res = await fetch("/api/sessions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ date, exercises }),
@@ -184,7 +189,7 @@ btnSave.addEventListener("click", async () => {
 
 // ── History ──────────────────────────────────────
 async function loadHistory(): Promise<void> {
-  const res = await fetch(`/api/profiles/${profileId}/sessions`);
+  const res = await fetch("/api/sessions");
   const sessions: Session[] = await res.json();
 
   if (sessions.length === 0) {
@@ -224,7 +229,7 @@ async function loadHistory(): Promise<void> {
 async function deleteSession(id: string): Promise<void> {
   if (!confirm("Delete this session?")) return;
 
-  const res = await fetch(`/api/profiles/${profileId}/sessions/${id}`, { method: "DELETE" });
+  const res = await fetch(`/api/sessions/${id}`, { method: "DELETE" });
   if (res.ok) {
     showToast("Session deleted");
     await loadHistory();
@@ -233,6 +238,13 @@ async function deleteSession(id: string): Promise<void> {
 
 // Make deleteSession available globally for inline onclick
 (window as any).deleteSession = deleteSession;
+
+// ── Sign out ─────────────────────────────────────
+async function signOut(): Promise<void> {
+  await fetch("/api/auth/signout", { method: "POST" });
+  window.location.href = "/";
+}
+(window as any).signOut = signOut;
 
 // ── Helpers ──────────────────────────────────────
 function resetForm(): void {

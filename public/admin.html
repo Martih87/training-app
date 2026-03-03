@@ -12,9 +12,12 @@
     <header>
       <div>
         <h1>📊 Training History</h1>
-        <a href="/" class="back-link" id="back-link">← Switch profile</a>
+        <span class="back-link" id="user-info"></span>
       </div>
-      <a href="/log.html" id="log-link" class="btn btn-secondary btn-sm">← Log Session</a>
+      <div>
+        <a href="/log.html" class="btn btn-secondary btn-sm">← Log Session</a>
+        <button class="btn btn-secondary btn-sm" onclick="signOut()">Sign out</button>
+      </div>
     </header>
 
     <!-- Stats overview -->
