@@ -1,0 +1,29 @@
+# fly.toml app configuration file generated for lightweight-training on 2026-03-04T11:06:23+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'lightweight-training'
+primary_region = 'arn'
+
+[build]
+
+[env]
+  DATA_DIR = '/data'
+  NODE_ENV = 'production'
+  PORT = '8080'
+
+[[mounts]]
+  source = 'data'
+  destination = '/data'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '256mb'

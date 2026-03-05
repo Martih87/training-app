@@ -3,55 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Training App</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>LightWeight!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Lexend', sans-serif;
+      min-height: 100vh;
+    }
+
     .landing {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 80vh;
+      min-height: 100vh;
       text-align: center;
+      overflow: hidden;
+      position: relative;
+      background: #000;
     }
 
-    .landing h1 {
-      font-size: 2.4rem;
+    /* ══════════════════════════════════════════
+       DRAGON IMAGE HERO
+       ══════════════════════════════════════════ */
+    .dragon-hero {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
       margin-bottom: 0.5rem;
+      padding: 0 1rem;
     }
 
-    .landing .subtitle {
-      color: #888;
-      font-size: 1rem;
-      margin-bottom: 2.5rem;
+    .dragon-hero img {
+      width: 100%;
+      height: auto;
+      display: block;
+      /* Feather-blend the edges into the black background */
+      mask-image: radial-gradient(ellipse 85% 80% at 50% 50%, #000 40%, transparent 72%);
+      -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 50%, #000 40%, transparent 72%);
     }
 
+    /* Subtle pulsing fire glow behind the image */
+    .dragon-hero::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 110%;
+      height: 120%;
+      background: radial-gradient(ellipse, rgba(255,120,0,0.10) 0%, rgba(255,60,0,0.04) 40%, transparent 70%);
+      pointer-events: none;
+      animation: glow-breathe 4s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes glow-breathe {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50%      { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    /* ══════════════════════════════════════════
+       TITLE
+       ══════════════════════════════════════════ */
+    .app-title {
+      font-size: clamp(2.2rem, 8vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #ffe082 0%, #ff9800 35%, #e65100 70%, #bf360c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(255,120,0,0.4));
+      margin-bottom: 0.15rem;
+      animation: title-pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes title-pulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(255,120,0,0.4)); }
+      50%      { filter: drop-shadow(0 0 35px rgba(255,120,0,0.7)); }
+    }
+
+    .subtitle {
+      font-size: clamp(0.9rem, 3vw, 1.15rem);
+      font-weight: 500;
+      color: rgba(255,200,120,0.5);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .tagline {
+      font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+      font-weight: 400;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1.5px;
+      margin-bottom: 2rem;
+    }
+
+    /* ══════════════════════════════════════════
+       SIGN-IN BOX
+       ══════════════════════════════════════════ */
     .signin-box {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,140,0,0.12);
       border-radius: 16px;
-      padding: 2rem 2.5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
+      padding: 1.8rem 2.2rem;
+      width: min(90vw, 340px);
     }
 
     .signin-box p {
-      color: #888;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.5px;
     }
 
-    .loading-msg {
-      color: #666;
-      font-size: 0.9rem;
+    .signin-box .loading-msg {
+      color: rgba(255,200,120,0.6);
+      font-size: 0.85rem;
+    }
+
+    #google-btn {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ══════════════════════════════════════════
+       REDUCED MOTION
+       ══════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container landing">
-    <h1>🏋️ Training App</h1>
-    <p class="subtitle">Sign in to track your workouts</p>
+
+    <div class="dragon-hero">
+      <img src="/dragon-eyes.png" alt="Dragon eyes glowing in the darkness" />
+    </div>
+
+    <h1 class="app-title">LightWeight!</h1>
+    <p class="subtitle">Yeah buddy!</p>
+    <p class="tagline">Your fitness tracker</p>
 
     <div class="signin-box">
       <p>Continue with your Google account</p>
@@ -61,18 +167,16 @@
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
-    // Check if already signed in — redirect to log page
+    // Check if already signed in
     fetch("/api/auth/me")
       .then(function(res) {
         if (res.ok) return res.json();
         return null;
       })
       .then(function(profile) {
-        if (profile) {
-          window.location.replace("/log.html");
-        }
+        if (profile) window.location.replace("/log.html");
       })
-      .catch(function() { /* not signed in, stay here */ });
+      .catch(function() {});
 
     // Load Google Client ID from server
     fetch("/api/auth/config")
@@ -83,33 +187,21 @@
             '<p style="color:#e74c3c">Google Client ID not configured.<br>Set GOOGLE_CLIENT_ID env variable.</p>';
           return;
         }
-
-        // Wait for GSI library to load
         function initGoogle() {
           if (typeof google === "undefined" || !google.accounts) {
             setTimeout(initGoogle, 100);
             return;
           }
-
           google.accounts.id.initialize({
             client_id: config.clientId,
             callback: handleCredentialResponse,
           });
-
           document.getElementById("google-btn").innerHTML = "";
-
           google.accounts.id.renderButton(
             document.getElementById("google-btn"),
-            {
-              theme: "filled_black",
-              size: "large",
-              shape: "pill",
-              text: "signin_with",
-              width: 280,
-            }
+            { theme: "filled_black", size: "large", shape: "pill", text: "signin_with", width: 280 }
           );
         }
-
         initGoogle();
       });
 

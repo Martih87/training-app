@@ -71,7 +71,7 @@ async function init(): Promise<void> {
   await loadHistory();
 }
 
-// ── Exercise Block Builder ───────────────────────
+// ── Exercise Block Builder (touch-optimised) ─────
 function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, checked: boolean): void {
   const block = document.createElement("div");
   block.className = "exercise-block";
@@ -82,17 +82,20 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
   const setsHtml = preset.sets
     .map((s, i) => {
       return `
-        <tr>
-          <td>${i + 1}</td>
-          <td><input type="number" class="input-weight" min="0" step="0.5" value="${s.weight}" /></td>
-          <td class="set-reps">${s.reps} reps</td>
-          <td>
-            <label class="check-container">
-              <input type="checkbox" class="set-done" ${checkedAttr} />
-              <span class="checkmark"></span>
-            </label>
-          </td>
-        </tr>`;
+        <div class="set-row">
+          <span class="set-num">${i + 1}</span>
+          <div class="stepper">
+            <button type="button" class="stepper-btn minus" data-step="-2.5">−</button>
+            <input type="number" class="input-weight" min="0" step="2.5" value="${s.weight}" inputmode="decimal" />
+            <button type="button" class="stepper-btn plus" data-step="2.5">+</button>
+          </div>
+          <span class="stepper-unit">kg</span>
+          <span class="reps-badge">${s.reps} reps</span>
+          <label class="check-container">
+            <input type="checkbox" class="set-done" ${checkedAttr} />
+            <span class="checkmark"></span>
+          </label>
+        </div>`;
     })
     .join("");
 
@@ -104,12 +107,7 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
         <span class="check-all-label">All</span>
       </label>
     </div>
-    <table class="sets-table">
-      <thead>
-        <tr><th>#</th><th>Weight</th><th>Reps</th><th>Done</th></tr>
-      </thead>
-      <tbody>${setsHtml}</tbody>
-    </table>
+    <div class="sets-list">${setsHtml}</div>
   `;
 
   // Wire up "check all" toggle
@@ -126,6 +124,18 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
       const all = setCheckboxes();
       checkAll.checked = Array.from(all).every((cb) => cb.checked);
     }
+  });
+
+  // Wire up stepper buttons
+  block.querySelectorAll(".stepper-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const step = parseFloat((btn as HTMLElement).dataset.step || "0");
+      const input = (btn as HTMLElement).closest(".stepper")!.querySelector("input") as HTMLInputElement;
+      const current = parseFloat(input.value) || 0;
+      const next = Math.max(0, current + step);
+      input.value = next % 1 === 0 ? next.toString() : next.toFixed(1);
+    });
   });
 
   container.appendChild(block);
@@ -152,7 +162,7 @@ btnSave.addEventListener("click", async () => {
     if (!preset) return;
 
     const sets: ExerciseSet[] = [];
-    block.querySelectorAll("tbody tr").forEach((row, i) => {
+    block.querySelectorAll(".set-row").forEach((row, i) => {
       const checked = (row.querySelector(".set-done") as HTMLInputElement).checked;
       if (checked && preset.sets[i]) {
         const weight = parseFloat((row.querySelector(".input-weight") as HTMLInputElement).value) || 0;

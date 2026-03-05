@@ -2,43 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Training App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>LightWeight!</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <header>
       <div>
-        <h1>🏋️ Training Log</h1>
+        <h1>🔥 LightWeight!</h1>
         <span class="back-link" id="user-info"></span>
       </div>
-      <div>
+      <div class="header-actions">
         <a href="/admin.html" class="btn btn-secondary btn-sm">📊 History</a>
         <button class="btn btn-secondary btn-sm" onclick="signOut()">Sign out</button>
       </div>
     </header>
 
-    <!-- NEW SESSION FORM -->
-    <section id="new-session" class="card">
-      <h2>Log a Session</h2>
-      <div class="form-row">
-        <label for="session-date">Date</label>
-        <input type="date" id="session-date" />
-      </div>
-
-      <h3 class="section-label">Core Exercises</h3>
-      <div id="exercise-list"></div>
-
-      <h3 class="section-label">Optional Exercises</h3>
-      <div id="optional-exercise-list"></div>
-
-      <button id="btn-save" class="btn btn-primary">Save Session</button>
+    <!-- DATE PICKER -->
+    <section class="card date-card">
+      <label for="session-date">Session Date</label>
+      <input type="date" id="session-date" />
     </section>
 
+    <!-- CORE EXERCISES -->
+    <h3 class="section-label">Core Exercises</h3>
+    <div id="exercise-list"></div>
+
+    <!-- OPTIONAL EXERCISES -->
+    <h3 class="section-label">Optional Exercises</h3>
+    <div id="optional-exercise-list"></div>
+
+    <!-- SAVE (sticky bottom) -->
+    <div class="sticky-save">
+      <button id="btn-save" class="btn btn-primary btn-save-full">Save Session</button>
+    </div>
+
     <!-- SESSION HISTORY -->
-    <section id="history" class="card">
-      <h2>Session History</h2>
+    <section id="history" class="card" style="margin-bottom:5rem">
+      <h2>Recent Sessions</h2>
       <div id="history-list"></div>
     </section>
   </div>

@@ -14,6 +14,7 @@ body {
   color: #e8e8e8;
   min-height: 100vh;
   padding: 1rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .container {
@@ -27,16 +28,21 @@ header {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 header h1 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   color: #fff;
 }
 
 header a {
   text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .back-link {
@@ -51,8 +57,11 @@ header a {
 }
 
 .btn-sm {
-  font-size: 0.8rem;
-  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* ── Card ────────────────────────────────────── */
@@ -60,14 +69,28 @@ header a {
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .card h2 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-bottom: 1rem;
   color: #c0c0c0;
+}
+
+/* ── Date Card ───────────────────────────────── */
+.date-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.date-card label {
+  font-size: 0.95rem;
+  color: #aaa;
+  font-weight: 500;
 }
 
 /* ── Form ────────────────────────────────────── */
@@ -85,16 +108,16 @@ header a {
 }
 
 input[type="date"],
-input[type="number"],
 select {
   background: #252525;
   border: 1px solid #3a3a3a;
   color: #e8e8e8;
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
+  min-height: 44px;
 }
 
 input:focus,
@@ -102,34 +125,35 @@ select:focus {
   border-color: #5b8def;
 }
 
-input[type="number"] {
-  width: 70px;
-  text-align: center;
-}
 /* ── Section Labels ───────────────────────── */
 .section-label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #666;
+  letter-spacing: 0.06em;
+  color: #555;
   margin: 1.25rem 0 0.5rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 1px solid #2a2a2a;
+  padding-left: 0.25rem;
 }
-/* ── Exercise Block ──────────────────────────── */
+
+/* ── Exercise Block (touch-optimised) ────────── */
 .exercise-block {
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 1rem;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 1rem 1rem 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.exercise-block.collapsed .sets-list,
+.exercise-block.collapsed .exercise-footer {
+  display: none;
 }
 
 .exercise-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  min-height: 44px;
 }
 
 .exercise-name {
@@ -138,17 +162,33 @@ input[type="number"] {
   color: #5b8def;
 }
 
+.exercise-toggle {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 1.2rem;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.exercise-block.collapsed .exercise-toggle {
+  transform: rotate(-90deg);
+}
+
 .check-all-container {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   cursor: pointer;
   user-select: none;
+  min-height: 44px;
+  padding: 0 0.25rem;
 }
 
 .check-all-container input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   accent-color: #5b8def;
   cursor: pointer;
 }
@@ -160,45 +200,116 @@ input[type="number"] {
   letter-spacing: 0.03em;
 }
 
-.exercise-header select {
+/* ── Set Row (touch-first) ───────────────────── */
+.sets-list {
+  margin-top: 0.5rem;
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #222;
+}
+
+.set-row:last-child {
+  border-bottom: none;
+}
+
+.set-num {
+  width: 1.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #555;
+  font-weight: 600;
+}
+
+/* ── Stepper input (weight) ──────────────────── */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
   flex: 1;
 }
 
-.sets-table {
-  width: 100%;
-  margin-bottom: 0.5rem;
-}
-
-.sets-table th {
-  font-size: 0.75rem;
-  color: #888;
-  text-transform: uppercase;
-  padding-bottom: 0.3rem;
-  text-align: center;
-}
-
-.sets-table td {
-  padding: 0.35rem 0.25rem;
-  text-align: center;
-  font-size: 0.95rem;
-  color: #ccc;
-}
-
-.set-weight {
+.stepper-btn {
+  width: 44px;
+  height: 44px;
+  background: #252525;
+  border: 1px solid #3a3a3a;
   color: #5b8def;
-  font-weight: 500;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.set-reps {
+.stepper-btn:active {
+  background: #333;
+}
+
+.stepper-btn.minus {
+  border-radius: 10px 0 0 10px;
+}
+
+.stepper-btn.plus {
+  border-radius: 0 10px 10px 0;
+}
+
+.stepper input[type="number"] {
+  width: 60px;
+  height: 44px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  border-left: none;
+  border-right: none;
+  color: #fff;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.stepper input[type="number"]::-webkit-outer-spin-button,
+.stepper input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stepper-unit {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 0.25rem;
+  min-width: 1.5rem;
+}
+
+/* ── Reps badge ──────────────────────────────── */
+.reps-badge {
+  background: #252525;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
   color: #aaa;
+  min-width: 3.5rem;
+  text-align: center;
+  white-space: nowrap;
 }
 
-/* ── Checkbox ───────────────────────────── */
+/* ── Checkbox (large touch target) ───────────── */
 .check-container {
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  padding: 0.25rem;
 }
 
 .check-container input[type="checkbox"] {
@@ -206,14 +317,14 @@ input[type="number"] {
 }
 
 .checkmark {
-  width: 26px;
-  height: 26px;
-  border: 2px solid #444;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #3a3a3a;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.15s;
   background: #1a1a1a;
 }
 
@@ -225,21 +336,27 @@ input[type="number"] {
 .check-container input:checked + .checkmark::after {
   content: "✓";
   color: #fff;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
 /* ── Buttons ─────────────────────────────────── */
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.95rem;
+  border-radius: 10px;
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-right: 0.5rem;
-  margin-top: 0.5rem;
+  transition: background 0.15s, transform 0.1s;
+  min-height: 48px;
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btn-primary {
@@ -264,19 +381,38 @@ input[type="number"] {
 .btn-danger {
   background: #c0392b;
   color: #fff;
-  font-size: 0.8rem;
-  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.85rem;
+  min-height: 40px;
 }
 
 .btn-danger:hover {
   background: #a93226;
 }
 
+/* ── Sticky Save Button ──────────────────────── */
+.sticky-save {
+  position: sticky;
+  bottom: 0;
+  padding: 0.75rem 0;
+  background: linear-gradient(transparent, #0f0f0f 30%);
+  z-index: 50;
+}
+
+.btn-save-full {
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 1rem;
+  border-radius: 14px;
+  min-height: 56px;
+}
+
 /* ── History ─────────────────────────────────── */
 .history-session {
   background: #222;
   border: 1px solid #333;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 1rem;
   margin-bottom: 0.75rem;
 }
@@ -313,17 +449,19 @@ input[type="number"] {
 /* ── Toast ───────────────────────────────────── */
 .toast {
   position: fixed;
-  bottom: 1.5rem;
+  bottom: 5rem;
   left: 50%;
   transform: translateX(-50%) translateY(100px);
   background: #2ecc71;
   color: #fff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
   opacity: 0;
   transition: all 0.3s ease;
   z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 .toast.show {

@@ -18,7 +18,7 @@ import {
 } from "./db";
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || "3000", 10);
 
 // --- Config ---
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
@@ -288,6 +288,6 @@ app.delete("/api/sessions/:id", requireAuth, (req, res) => {
 
 // --- Start ---
 
-app.listen(PORT, () => {
-  console.log(`🏋️  Training app running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🔥 LightWeight! running at http://0.0.0.0:${PORT}`);
 });
