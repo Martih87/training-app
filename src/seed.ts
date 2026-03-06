@@ -28,6 +28,7 @@ const optional: Preset[] = [
   { name: "Incline Bench",  sets: [{ weight: 48, reps: 10 }, { weight: 48, reps: 10 }, { weight: 48, reps: 10 }] },
   { name: "Overhead Press",  sets: [{ weight: 40, reps: 10 }, { weight: 40, reps: 10 }, { weight: 40, reps: 10 }] },
   { name: "Deadlift",       sets: [{ weight: 48, reps: 10 }, { weight: 48, reps: 10 }, { weight: 48, reps: 10 }] },
+  { name: "Landmine Barbell Rows", sets: [{ weight: 30, reps: 10 }, { weight: 30, reps: 10 }, { weight: 30, reps: 10 }] },
 ];
 
 // --- Helpers ---

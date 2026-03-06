@@ -250,7 +250,10 @@ function renderSessionList(): void {
           <div class="si-exercises">${exerciseNames}</div>
           <div class="session-detail">
             ${detailHtml}
-            <button class="btn btn-danger" style="margin-top:0.5rem" onclick="event.stopPropagation(); deleteSession('${s.id}')">Delete</button>
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+              <a href="/log.html?edit=${s.id}" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()">Edit</a>
+              <button class="btn btn-danger" onclick="event.stopPropagation(); deleteSession('${s.id}')">Delete</button>
+            </div>
           </div>
         </div>`;
     })

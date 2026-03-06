@@ -33,6 +33,30 @@
     <h3 class="section-label">Optional Exercises</h3>
     <div id="optional-exercise-list"></div>
 
+    <!-- USER EXERCISES (linked to account) -->
+    <h3 class="section-label">Your Exercises</h3>
+    <div id="user-exercise-list"></div>
+
+    <!-- ADD CUSTOM EXERCISE -->
+    <section class="card add-exercise-card">
+      <h3 class="section-label" style="margin-top:0">Add Exercise</h3>
+      <div class="add-exercise-form">
+        <input type="text" id="add-exercise-name" placeholder="Exercise name" class="input-text" />
+        <div class="add-exercise-defaults">
+          <label>Weight <input type="number" id="add-exercise-weight" value="0" min="0" step="2.5" inputmode="decimal" /></label>
+          <label>Reps <input type="number" id="add-exercise-reps" value="10" min="1" inputmode="numeric" /></label>
+          <label>Sets <input type="number" id="add-exercise-sets" value="3" min="1" max="10" inputmode="numeric" /></label>
+        </div>
+        <button id="btn-add-exercise" class="btn btn-secondary">+ Add Exercise</button>
+      </div>
+    </section>
+
+    <!-- SUGGESTIONS -->
+    <section class="card" id="suggestions-section">
+      <h3 class="section-label" style="margin-top:0">Popular with others</h3>
+      <div id="suggestions-list" class="suggestions-list"></div>
+    </section>
+
     <!-- SAVE (sticky bottom) -->
     <div class="sticky-save">
       <button id="btn-save" class="btn btn-primary btn-save-full">Save Session</button>
@@ -40,7 +64,13 @@
 
     <!-- SESSION HISTORY -->
     <section id="history" class="card" style="margin-bottom:5rem">
-      <h2>Recent Sessions</h2>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+        <h2>Recent Sessions</h2>
+        <div>
+          <a href="/api/export?format=csv" class="btn btn-secondary btn-sm" download>CSV</a>
+          <a href="/api/export?format=json" class="btn btn-secondary btn-sm" download>JSON</a>
+        </div>
+      </div>
       <div id="history-list"></div>
     </section>
   </div>

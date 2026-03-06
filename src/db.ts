@@ -73,11 +73,26 @@ db.exec(`
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
   );
 
+  CREATE TABLE IF NOT EXISTS user_exercises (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id  TEXT    NOT NULL,
+    name        TEXT    NOT NULL,
+    default_weight REAL NOT NULL DEFAULT 0,
+    default_reps   INTEGER NOT NULL DEFAULT 10,
+    default_sets   INTEGER NOT NULL DEFAULT 3,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE,
+    UNIQUE(profile_id, name)
+  );
+
   CREATE INDEX IF NOT EXISTS idx_exercises_session
     ON session_exercises(session_id);
 
   CREATE INDEX IF NOT EXISTS idx_sessions_profile
     ON sessions(profile_id);
+
+  CREATE INDEX IF NOT EXISTS idx_user_exercises_profile
+    ON user_exercises(profile_id);
 `);
 
 // --- Migration: add google columns to existing profiles ---
@@ -146,6 +161,38 @@ const selectExercisesForSession = db.prepare(
 
 const deleteSessionStmt = db.prepare(
   `DELETE FROM sessions WHERE id = ?`
+);
+
+const deleteExercisesForSession = db.prepare(
+  `DELETE FROM session_exercises WHERE session_id = ?`
+);
+
+const updateSessionDate = db.prepare(
+  `UPDATE sessions SET date = ? WHERE id = ?`
+);
+
+// User exercises
+const insertUserExercise = db.prepare(
+  `INSERT OR IGNORE INTO user_exercises (profile_id, name, default_weight, default_reps, default_sets) VALUES (?, ?, ?, ?, ?)`
+);
+
+const selectUserExercises = db.prepare(
+  `SELECT id, profile_id, name, default_weight, default_reps, default_sets FROM user_exercises WHERE profile_id = ? ORDER BY name`
+);
+
+const deleteUserExerciseStmt = db.prepare(
+  `DELETE FROM user_exercises WHERE id = ? AND profile_id = ?`
+);
+
+// Suggestions: exercises used by other profiles, ranked by popularity
+const selectSuggestedExercises = db.prepare(
+  `SELECT exercise AS name, COUNT(DISTINCT s.profile_id) AS user_count, COUNT(*) AS total_uses
+   FROM session_exercises se
+   JOIN sessions s ON se.session_id = s.id
+   WHERE s.profile_id != ?
+   GROUP BY exercise
+   ORDER BY user_count DESC, total_uses DESC
+   LIMIT 20`
 );
 
 // --- Public API: Profiles ---
@@ -247,6 +294,24 @@ export const createSession = db.transaction(
   }
 );
 
+export const updateSession = db.transaction(
+  (id: string, date: string, exercises: ExerciseEntry[]): Session | undefined => {
+    const row = selectSessionById.get(id) as { id: string; profile_id: string; date: string } | undefined;
+    if (!row) return undefined;
+
+    updateSessionDate.run(date, id);
+    deleteExercisesForSession.run(id);
+
+    for (const ex of exercises) {
+      for (let i = 0; i < ex.sets.length; i++) {
+        insertSet.run(id, ex.name, i + 1, ex.sets[i].weight, ex.sets[i].reps);
+      }
+    }
+
+    return { id, profileId: row.profile_id, date, exercises };
+  }
+);
+
 export function deleteSession(id: string): boolean {
   const result = deleteSessionStmt.run(id);
   return result.changes > 0;
@@ -272,6 +337,72 @@ function getExercisesForSession(sessionId: string): ExerciseEntry[] {
   }
 
   return Array.from(map.entries()).map(([name, sets]) => ({ name, sets }));
+}
+
+// --- Public API: User Exercises ---
+
+export interface UserExercise {
+  id: number;
+  profileId: string;
+  name: string;
+  defaultWeight: number;
+  defaultReps: number;
+  defaultSets: number;
+}
+
+export function getUserExercises(profileId: string): UserExercise[] {
+  const rows = selectUserExercises.all(profileId) as any[];
+  return rows.map((r) => ({
+    id: r.id,
+    profileId: r.profile_id,
+    name: r.name,
+    defaultWeight: r.default_weight,
+    defaultReps: r.default_reps,
+    defaultSets: r.default_sets,
+  }));
+}
+
+export function addUserExercise(
+  profileId: string,
+  name: string,
+  defaultWeight: number,
+  defaultReps: number,
+  defaultSets: number
+): UserExercise | undefined {
+  insertUserExercise.run(profileId, name, defaultWeight, defaultReps, defaultSets);
+  const exercises = getUserExercises(profileId);
+  return exercises.find((e) => e.name === name);
+}
+
+export function removeUserExercise(id: number, profileId: string): boolean {
+  const result = deleteUserExerciseStmt.run(id, profileId);
+  return result.changes > 0;
+}
+
+// --- Public API: Suggestions ---
+
+export interface ExerciseSuggestion {
+  name: string;
+  userCount: number;
+  totalUses: number;
+}
+
+export function getExerciseSuggestions(profileId: string): ExerciseSuggestion[] {
+  const rows = selectSuggestedExercises.all(profileId) as any[];
+  return rows.map((r) => ({
+    name: r.name,
+    userCount: r.user_count,
+    totalUses: r.total_uses,
+  }));
+}
+
+// --- Public API: Export ---
+
+export function exportUserData(profileId: string): { profile: Profile; sessions: Session[] } {
+  const profile = getProfile(profileId);
+  if (!profile) throw new Error("Profile not found");
+  const sessions = getSessionsByProfile(profileId);
+  return { profile, sessions };
 }
 
 export function closeDb(): void {
