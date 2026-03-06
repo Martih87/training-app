@@ -181,9 +181,9 @@ const coreExercises: ExercisePreset[] = [
   {
     name: "Lateral Raises",
     sets: [
-      { weight: 10, reps: 12 },
-      { weight: 10, reps: 12 },
-      { weight: 10, reps: 12 },
+      { weight: 20, reps: 12 },
+      { weight: 20, reps: 12 },
+      { weight: 20, reps: 12 },
     ],
   },
   {

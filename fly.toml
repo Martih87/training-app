@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for lightweight-training on 2026-03-04T11:06:23+01:00
+# fly.toml app configuration file generated for lightweight-training-bitter-hill-8170 on 2026-03-06T10:28:01+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'lightweight-training'
+app = 'lightweight-training-bitter-hill-8170'
 primary_region = 'arn'
 
 [build]

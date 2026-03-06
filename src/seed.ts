@@ -19,7 +19,7 @@ interface Preset {
 const core: Preset[] = [
   { name: "Benchpress",     sets: [{ weight: 60, reps: 12 }, { weight: 65, reps: 12 }, { weight: 70, reps: 12 }] },
   { name: "Bicep Curls",    sets: [{ weight: 32, reps: 10 }, { weight: 32, reps: 10 }, { weight: 32, reps: 10 }] },
-  { name: "Lateral Raises", sets: [{ weight: 10, reps: 12 }, { weight: 10, reps: 12 }, { weight: 10, reps: 12 }] },
+  { name: "Lateral Raises", sets: [{ weight: 20, reps: 12 }, { weight: 20, reps: 12 }, { weight: 20, reps: 12 }] },
   { name: "Ab Crunches",    sets: [{ weight: 0,  reps: 15 }, { weight: 0,  reps: 15 }, { weight: 0,  reps: 15 }] },
 ];
 
