@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LightWeight! — Recommendations</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="recommendations.css" />
+</head>
+<body>
+  <div class="container admin-container">
+    <header>
+      <div>
+        <h1>📈 Recommendations</h1>
+        <span class="back-link" id="user-info"></span>
+      </div>
+      <div>
+        <a href="/log.html" class="btn btn-secondary btn-sm">← Log Session</a>
+        <a href="/admin.html" class="btn btn-secondary btn-sm">📊 History</a>
+        <button class="btn btn-secondary btn-sm" onclick="signOut()">Sign out</button>
+      </div>
+    </header>
+
+    <!-- Week indicator -->
+    <section class="card week-card">
+      <div class="week-nav">
+        <button id="btn-prev-week" class="btn btn-secondary btn-sm">← Prev</button>
+        <div>
+          <h2 id="week-title">This Week</h2>
+          <p id="week-range" class="week-range"></p>
+        </div>
+        <button id="btn-next-week" class="btn btn-secondary btn-sm">Next →</button>
+      </div>
+    </section>
+
+    <!-- Muscle group breakdown -->
+    <section class="card">
+      <h2>Weekly Sets by Muscle Group</h2>
+      <div id="muscle-group-list" class="muscle-group-list"></div>
+    </section>
+
+    <!-- Suggestions -->
+    <section class="card" id="suggestions-card">
+      <h2>Areas to Improve</h2>
+      <div id="improvement-list" class="improvement-list"></div>
+    </section>
+
+    <!-- Level legend -->
+    <section class="card">
+      <h2>Level Guide</h2>
+      <div class="level-legend">
+        <div class="level-item"><span class="level-dot level-below"></span> Below Beginner</div>
+        <div class="level-item"><span class="level-dot level-beginner"></span> Beginner</div>
+        <div class="level-item"><span class="level-dot level-intermediate"></span> Intermediate</div>
+        <div class="level-item"><span class="level-dot level-pro"></span> Pro</div>
+      </div>
+    </section>
+  </div>
+
+  <script src="recommendations.js"></script>
+</body>
+</html>

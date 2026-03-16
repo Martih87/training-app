@@ -93,6 +93,21 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_user_exercises_profile
     ON user_exercises(profile_id);
+
+  CREATE TABLE IF NOT EXISTS exercise_overrides (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id  TEXT    NOT NULL,
+    exercise    TEXT    NOT NULL,
+    is_core     INTEGER NOT NULL DEFAULT 0,
+    default_weight REAL NOT NULL DEFAULT 0,
+    default_reps   INTEGER NOT NULL DEFAULT 10,
+    default_sets   INTEGER NOT NULL DEFAULT 3,
+    FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE,
+    UNIQUE(profile_id, exercise)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_exercise_overrides_profile
+    ON exercise_overrides(profile_id);
 `);
 
 // --- Migration: add google columns to existing profiles ---
@@ -193,6 +208,31 @@ const selectSuggestedExercises = db.prepare(
    GROUP BY exercise
    ORDER BY user_count DESC, total_uses DESC
    LIMIT 20`
+);
+
+// Exercise overrides
+const upsertExerciseOverride = db.prepare(
+  `INSERT INTO exercise_overrides (profile_id, exercise, is_core, default_weight, default_reps, default_sets)
+   VALUES (?, ?, ?, ?, ?, ?)
+   ON CONFLICT(profile_id, exercise) DO UPDATE SET
+     is_core = excluded.is_core,
+     default_weight = excluded.default_weight,
+     default_reps = excluded.default_reps,
+     default_sets = excluded.default_sets`
+);
+
+const selectExerciseOverrides = db.prepare(
+  `SELECT exercise, is_core, default_weight, default_reps, default_sets
+   FROM exercise_overrides WHERE profile_id = ?`
+);
+
+// Weekly sets per muscle group (for recommendations)
+const selectWeeklySets = db.prepare(
+  `SELECT se.exercise, COUNT(*) AS total_sets
+   FROM session_exercises se
+   JOIN sessions s ON se.session_id = s.id
+   WHERE s.profile_id = ? AND s.date >= ? AND s.date <= ?
+   GROUP BY se.exercise`
 );
 
 // --- Public API: Profiles ---
@@ -403,6 +443,53 @@ export function exportUserData(profileId: string): { profile: Profile; sessions:
   if (!profile) throw new Error("Profile not found");
   const sessions = getSessionsByProfile(profileId);
   return { profile, sessions };
+}
+
+// --- Public API: Exercise Overrides ---
+
+export interface ExerciseOverride {
+  exercise: string;
+  isCore: boolean;
+  defaultWeight: number;
+  defaultReps: number;
+  defaultSets: number;
+}
+
+export function getExerciseOverrides(profileId: string): ExerciseOverride[] {
+  const rows = selectExerciseOverrides.all(profileId) as any[];
+  return rows.map((r) => ({
+    exercise: r.exercise,
+    isCore: r.is_core === 1,
+    defaultWeight: r.default_weight,
+    defaultReps: r.default_reps,
+    defaultSets: r.default_sets,
+  }));
+}
+
+export function setExerciseOverride(
+  profileId: string,
+  exercise: string,
+  isCore: boolean,
+  defaultWeight: number,
+  defaultReps: number,
+  defaultSets: number
+): void {
+  upsertExerciseOverride.run(profileId, exercise, isCore ? 1 : 0, defaultWeight, defaultReps, defaultSets);
+}
+
+// --- Public API: Recommendations ---
+
+export interface WeeklyExerciseSets {
+  exercise: string;
+  totalSets: number;
+}
+
+export function getWeeklySets(profileId: string, weekStart: string, weekEnd: string): WeeklyExerciseSets[] {
+  const rows = selectWeeklySets.all(profileId, weekStart, weekEnd) as any[];
+  return rows.map((r) => ({
+    exercise: r.exercise,
+    totalSets: r.total_sets,
+  }));
 }
 
 export function closeDb(): void {

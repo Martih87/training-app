@@ -1,0 +1,169 @@
+/* ── Recommendations page styles ─────────────── */
+
+.week-card {
+  text-align: center;
+}
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.week-nav h2 {
+  margin-bottom: 0.25rem;
+}
+
+.week-nav .btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.week-range {
+  font-size: 1.1rem;
+  color: #5b8def;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+/* ── Muscle group rows ───────────────────────── */
+.muscle-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mg-row {
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.mg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.mg-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.mg-level {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.level-badge-below-beginner { background: #4a1c1c; color: #e74c3c; }
+.level-badge-beginner        { background: #2d3a1e; color: #a3d977; }
+.level-badge-intermediate    { background: #1e3a3a; color: #5bc0de; }
+.level-badge-pro             { background: #3a2e1e; color: #f0ad4e; }
+
+/* ── Progress bar ────────────────────────────── */
+.mg-bar-container {
+  position: relative;
+  height: 22px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  overflow: visible;
+  margin-bottom: 0.3rem;
+}
+
+.mg-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  min-width: 2px;
+}
+
+.mg-bar-below-beginner { background: #e74c3c; }
+.mg-bar-beginner       { background: #a3d977; }
+.mg-bar-intermediate   { background: linear-gradient(90deg, #a3d977, #5bc0de); }
+.mg-bar-pro            { background: linear-gradient(90deg, #5bc0de, #f0ad4e); }
+
+/* Target markers */
+.mg-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #555;
+  z-index: 1;
+}
+
+.mg-marker::after {
+  content: "B";
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: #666;
+}
+
+.mg-marker-int::after { content: "I"; }
+.mg-marker-pro::after { content: "P"; }
+
+.mg-stats {
+  font-size: 0.8rem;
+  color: #888;
+  text-align: right;
+}
+
+.mg-examples {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* ── Improvement items ───────────────────────── */
+.improvement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.improvement-item {
+  background: #2d1f1f;
+  border: 1px solid #4a2a2a;
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9rem;
+  color: #e8c8c8;
+}
+
+/* ── Level legend ────────────────────────────── */
+.level-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.level-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.level-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.level-below        { background: #e74c3c; }
+.level-beginner     { background: #a3d977; }
+.level-intermediate { background: #5bc0de; }
+.level-pro          { background: #f0ad4e; }
