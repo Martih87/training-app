@@ -19,6 +19,9 @@ import {
   removeUserExercise,
   getExerciseSuggestions,
   exportUserData,
+  getExerciseOverrides,
+  setExerciseOverride,
+  getWeeklySets,
   ExerciseEntry,
   Profile,
 } from "./db";
@@ -243,6 +246,42 @@ const optionalExercises: ExercisePreset[] = [
 app.get("/api/exercises", requireAuth, (req, res) => {
   const profile = (req as any).profile as Profile;
   const userExercises = getUserExercises(profile.id);
+  const overrides = getExerciseOverrides(profile.id);
+  const overrideMap = new Map(overrides.map((o) => [o.exercise, o]));
+
+  // Apply overrides to presets
+  const applyOverride = (preset: ExercisePreset): ExercisePreset => {
+    const ov = overrideMap.get(preset.name);
+    if (!ov) return preset;
+    return {
+      name: preset.name,
+      sets: Array.from({ length: ov.defaultSets }, () => ({
+        weight: ov.defaultWeight,
+        reps: ov.defaultReps,
+      })),
+    };
+  };
+
+  // Split presets according to overrides: if a user has moved an exercise, respect that
+  const allPresets = [...coreExercises, ...optionalExercises];
+  const overriddenCore: ExercisePreset[] = [];
+  const overriddenOptional: ExercisePreset[] = [];
+
+  for (const preset of allPresets) {
+    const ov = overrideMap.get(preset.name);
+    const applied = applyOverride(preset);
+    if (ov) {
+      if (ov.isCore) overriddenCore.push(applied);
+      else overriddenOptional.push(applied);
+    } else {
+      // Default: core exercises stay core, optional stay optional
+      if (coreExercises.some((c) => c.name === preset.name)) {
+        overriddenCore.push(applied);
+      } else {
+        overriddenOptional.push(applied);
+      }
+    }
+  }
 
   // Convert user exercises to preset format
   const userPresets: ExercisePreset[] = userExercises.map((ue) => ({
@@ -253,7 +292,7 @@ app.get("/api/exercises", requireAuth, (req, res) => {
     })),
   }));
 
-  res.json({ core: coreExercises, optional: optionalExercises, user: userPresets });
+  res.json({ core: overriddenCore, optional: overriddenOptional, user: userPresets });
 });
 
 // --- User Exercise routes (auth-protected) ---
@@ -305,6 +344,142 @@ app.delete("/api/user-exercises/:id", requireAuth, (req, res) => {
 app.get("/api/suggestions", requireAuth, (req, res) => {
   const profile = (req as any).profile as Profile;
   res.json(getExerciseSuggestions(profile.id));
+});
+
+// --- Exercise Overrides ---
+
+app.get("/api/exercise-overrides", requireAuth, (req, res) => {
+  const profile = (req as any).profile as Profile;
+  res.json(getExerciseOverrides(profile.id));
+});
+
+app.put("/api/exercise-overrides", requireAuth, (req, res) => {
+  const profile = (req as any).profile as Profile;
+  const { exercise, isCore, defaultWeight, defaultReps, defaultSets } = req.body as {
+    exercise: string;
+    isCore: boolean;
+    defaultWeight: number;
+    defaultReps: number;
+    defaultSets: number;
+  };
+  if (!exercise || typeof exercise !== "string") {
+    res.status(400).json({ error: "exercise name is required" });
+    return;
+  }
+  setExerciseOverride(
+    profile.id,
+    exercise.trim(),
+    !!isCore,
+    defaultWeight ?? 0,
+    defaultReps ?? 10,
+    defaultSets ?? 3
+  );
+  res.json({ ok: true });
+});
+
+// --- Recommendations ---
+
+// Muscle group mapping for built-in exercises
+const muscleGroupMap: Record<string, string[]> = {
+  "Benchpress": ["Chest", "Triceps"],
+  "Bicep Curls": ["Biceps"],
+  "Lateral Raises": ["Shoulders"],
+  "Ab Crunches": ["Core"],
+  "Leg Extension": ["Legs"],
+  "Incline Bench": ["Chest", "Triceps"],
+  "Overhead Press": ["Shoulders", "Triceps"],
+  "Deadlift": ["Back", "Legs"],
+  "Landmine Barbell Rows": ["Back", "Biceps"],
+};
+
+// Weekly set targets per muscle group by level
+const setTargets: Record<string, { beginner: number; intermediate: number; pro: number }> = {
+  "Chest": { beginner: 6, intermediate: 10, pro: 16 },
+  "Back": { beginner: 6, intermediate: 10, pro: 16 },
+  "Shoulders": { beginner: 6, intermediate: 10, pro: 16 },
+  "Biceps": { beginner: 4, intermediate: 8, pro: 12 },
+  "Triceps": { beginner: 4, intermediate: 8, pro: 12 },
+  "Legs": { beginner: 6, intermediate: 10, pro: 16 },
+  "Core": { beginner: 4, intermediate: 8, pro: 12 },
+};
+
+// Example exercises per muscle group
+const muscleGroupExamples: Record<string, string[]> = {
+  "Chest": ["Bench Press", "Incline Bench", "Dumbbell Flyes", "Cable Crossovers", "Push-Ups"],
+  "Back": ["Deadlift", "Barbell Rows", "Pull-Ups", "Lat Pulldown", "Seated Cable Row"],
+  "Shoulders": ["Overhead Press", "Lateral Raises", "Front Raises", "Face Pulls", "Arnold Press"],
+  "Biceps": ["Bicep Curls", "Hammer Curls", "Preacher Curls", "Concentration Curls"],
+  "Triceps": ["Tricep Dips", "Skull Crushers", "Tricep Pushdowns", "Overhead Extensions"],
+  "Legs": ["Squats", "Leg Press", "Leg Extension", "Leg Curls", "Lunges", "Calf Raises"],
+  "Core": ["Ab Crunches", "Planks", "Hanging Leg Raises", "Cable Woodchops", "Russian Twists"],
+};
+
+app.get("/api/recommendations", requireAuth, (req, res) => {
+  const profile = (req as any).profile as Profile;
+
+  // Calculate week (Mon–Sun), offset by ?week param (0 = current, -1 = last week, etc.)
+  const weekOffset = parseInt((req.query.week as string) || "0", 10) || 0;
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() + mondayOffset + weekOffset * 7);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const weekStartStr = weekStart.toISOString().slice(0, 10);
+  const weekEndStr = weekEnd.toISOString().slice(0, 10);
+
+  const exerciseSets = getWeeklySets(profile.id, weekStartStr, weekEndStr);
+
+  // Aggregate sets per muscle group
+  const muscleGroupSets: Record<string, number> = {};
+  for (const group of Object.keys(setTargets)) {
+    muscleGroupSets[group] = 0;
+  }
+
+  for (const es of exerciseSets) {
+    const groups = muscleGroupMap[es.exercise] || ["Other"];
+    for (const group of groups) {
+      if (muscleGroupSets[group] !== undefined) {
+        muscleGroupSets[group] += es.totalSets;
+      }
+    }
+  }
+
+  // Build per-muscle-group results
+  const muscleGroups = Object.entries(setTargets).map(([group, targets]) => {
+    const actual = muscleGroupSets[group] || 0;
+    let level: string;
+    if (actual >= targets.pro) level = "pro";
+    else if (actual >= targets.intermediate) level = "intermediate";
+    else if (actual >= targets.beginner) level = "beginner";
+    else level = "below beginner";
+
+    return {
+      group,
+      actualSets: actual,
+      targets,
+      level,
+      examples: muscleGroupExamples[group] || [],
+    };
+  });
+
+  // Generate suggestions for lacking areas
+  const suggestions: string[] = [];
+  for (const mg of muscleGroups) {
+    if (mg.actualSets < mg.targets.beginner) {
+      const deficit = mg.targets.beginner - mg.actualSets;
+      suggestions.push(`${mg.group} needs ${deficit} more set${deficit > 1 ? "s" : ""} to reach beginner level`);
+    }
+  }
+
+  res.json({
+    weekStart: weekStartStr,
+    weekEnd: weekEndStr,
+    muscleGroups,
+    suggestions,
+  });
 });
 
 // --- Profile routes ---

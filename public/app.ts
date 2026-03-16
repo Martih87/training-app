@@ -103,6 +103,11 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
 
   const checkedAttr = checked ? "checked" : "";
 
+  // Determine if this is a user exercise (not in core or optional)
+  const isUserExercise =
+    !corePresets.some((p) => p.name === preset.name) &&
+    !optionalPresets.some((p) => p.name === preset.name);
+
   const setsHtml = preset.sets
     .map((s, i) => {
       return `
@@ -123,13 +128,20 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
     })
     .join("");
 
+  const editBtnHtml = !isUserExercise
+    ? `<button type="button" class="btn-edit-exercise" title="Edit defaults">⚙</button>`
+    : "";
+
   block.innerHTML = `
     <div class="exercise-header">
       <span class="exercise-name">${preset.name}</span>
-      <label class="check-all-container">
-        <input type="checkbox" class="check-all" ${checkedAttr} />
-        <span class="check-all-label">All</span>
-      </label>
+      <div style="display:flex;align-items:center;gap:0.4rem">
+        ${editBtnHtml}
+        <label class="check-all-container">
+          <input type="checkbox" class="check-all" ${checkedAttr} />
+          <span class="check-all-label">All</span>
+        </label>
+      </div>
     </div>
     <div class="sets-list">${setsHtml}</div>
   `;
@@ -161,6 +173,15 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
       input.value = next % 1 === 0 ? next.toString() : next.toFixed(1);
     });
   });
+
+  // Wire up edit defaults button
+  const editBtn = block.querySelector(".btn-edit-exercise");
+  if (editBtn) {
+    editBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      showEditModal(preset, container);
+    });
+  }
 
   container.appendChild(block);
 }
@@ -403,6 +424,91 @@ async function addSuggestion(name: string): Promise<void> {
   showToast(`"${name}" — set defaults and click Add`);
 }
 (window as any).addSuggestion = addSuggestion;
+
+// ── Edit Exercise Defaults Modal ─────────────────
+function showEditModal(preset: ExercisePreset, currentContainer: HTMLDivElement): void {
+  // Determine current classification
+  const isCurrentlyCore = currentContainer === exerciseListDiv;
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-card">
+      <h3>Edit "${preset.name}" Defaults</h3>
+      <div class="modal-form">
+        <label>Default Weight (kg)
+          <input type="number" id="modal-weight" value="${preset.sets[0]?.weight ?? 0}" min="0" step="2.5" inputmode="decimal" />
+        </label>
+        <label>Default Reps
+          <input type="number" id="modal-reps" value="${preset.sets[0]?.reps ?? 10}" min="1" inputmode="numeric" />
+        </label>
+        <label>Number of Sets
+          <input type="number" id="modal-sets" value="${preset.sets.length}" min="1" max="10" inputmode="numeric" />
+        </label>
+        <label class="modal-toggle">
+          <input type="checkbox" id="modal-is-core" ${isCurrentlyCore ? "checked" : ""} />
+          <span>Core exercise (checked by default)</span>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="modal-save" class="btn btn-primary">Save Defaults</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add("show"));
+
+  const close = () => {
+    overlay.classList.remove("show");
+    setTimeout(() => overlay.remove(), 200);
+  };
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+
+  overlay.querySelector("#modal-cancel")!.addEventListener("click", close);
+
+  overlay.querySelector("#modal-save")!.addEventListener("click", async () => {
+    const weight = parseFloat((overlay.querySelector("#modal-weight") as HTMLInputElement).value) || 0;
+    const reps = parseInt((overlay.querySelector("#modal-reps") as HTMLInputElement).value, 10) || 10;
+    const sets = parseInt((overlay.querySelector("#modal-sets") as HTMLInputElement).value, 10) || 3;
+    const isCore = (overlay.querySelector("#modal-is-core") as HTMLInputElement).checked;
+
+    const res = await fetch("/api/exercise-overrides", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        exercise: preset.name,
+        isCore,
+        defaultWeight: weight,
+        defaultReps: reps,
+        defaultSets: sets,
+      }),
+    });
+
+    if (res.ok) {
+      showToast(`Defaults updated for "${preset.name}" ✅`);
+      close();
+      // Refresh presets and re-render
+      const exRes = await fetch("/api/exercises");
+      const data = await exRes.json();
+      corePresets = data.core;
+      optionalPresets = data.optional;
+      userPresets = data.user || [];
+      exerciseListDiv.innerHTML = "";
+      optionalListDiv.innerHTML = "";
+      userExerciseListDiv.innerHTML = "";
+      corePresets.forEach((p: ExercisePreset) => addExerciseBlock(p, exerciseListDiv, true));
+      optionalPresets.forEach((p: ExercisePreset) => addExerciseBlock(p, optionalListDiv, false));
+      userPresets.forEach((p: ExercisePreset) => addExerciseBlock(p, userExerciseListDiv, false));
+    } else {
+      showToast("Failed to save defaults", "#e74c3c");
+    }
+  });
+}
 
 // ── Sign out ─────────────────────────────────────
 async function signOut(): Promise<void> {
