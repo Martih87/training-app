@@ -290,17 +290,25 @@ select:focus {
   min-width: 1.5rem;
 }
 
-/* ── Reps badge ──────────────────────────────── */
-.reps-badge {
-  background: #252525;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.85rem;
-  color: #aaa;
-  min-width: 3.5rem;
-  text-align: center;
-  white-space: nowrap;
+/* ── Reps stepper ────────────────────────────── */
+.reps-stepper {
+  flex: 0 0 auto;
+}
+
+.reps-stepper .stepper-btn {
+  width: 32px;
+  height: 34px;
+  font-size: 1rem;
+}
+
+.reps-stepper input[type="number"] {
+  width: 42px;
+  height: 34px;
+  font-size: 0.9rem;
+}
+
+.reps-unit {
+  min-width: 2.2rem;
 }
 
 /* ── Checkbox (large touch target) ───────────── */

@@ -114,12 +114,17 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
         <div class="set-row">
           <span class="set-num">${i + 1}</span>
           <div class="stepper">
-            <button type="button" class="stepper-btn minus" data-step="-2.5">−</button>
+            <button type="button" class="stepper-btn minus" data-step="-2.5" data-mode="float" data-min="0">−</button>
             <input type="number" class="input-weight" min="0" step="2.5" value="${s.weight}" inputmode="decimal" />
-            <button type="button" class="stepper-btn plus" data-step="2.5">+</button>
+            <button type="button" class="stepper-btn plus" data-step="2.5" data-mode="float" data-min="0">+</button>
           </div>
           <span class="stepper-unit">kg</span>
-          <span class="reps-badge">${s.reps} reps</span>
+          <div class="stepper reps-stepper">
+            <button type="button" class="stepper-btn minus" data-step="-1" data-mode="int" data-min="1">−</button>
+            <input type="number" class="input-reps" min="1" step="1" value="${s.reps}" inputmode="numeric" />
+            <button type="button" class="stepper-btn plus" data-step="1" data-mode="int" data-min="1">+</button>
+          </div>
+          <span class="stepper-unit reps-unit">reps</span>
           <label class="check-container">
             <input type="checkbox" class="set-done" ${checkedAttr} />
             <span class="checkmark"></span>
@@ -166,11 +171,18 @@ function addExerciseBlock(preset: ExercisePreset, container: HTMLDivElement, che
   block.querySelectorAll(".stepper-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      const step = parseFloat((btn as HTMLElement).dataset.step || "0");
+      const btnEl = btn as HTMLElement;
+      const step = parseFloat(btnEl.dataset.step || "0");
+      const min = parseFloat(btnEl.dataset.min || "0");
+      const mode = btnEl.dataset.mode || "float";
       const input = (btn as HTMLElement).closest(".stepper")!.querySelector("input") as HTMLInputElement;
       const current = parseFloat(input.value) || 0;
-      const next = Math.max(0, current + step);
-      input.value = next % 1 === 0 ? next.toString() : next.toFixed(1);
+      const next = Math.max(min, current + step);
+      if (mode === "int") {
+        input.value = Math.round(next).toString();
+      } else {
+        input.value = next % 1 === 0 ? next.toString() : next.toFixed(1);
+      }
     });
   });
 
@@ -212,7 +224,10 @@ btnSave.addEventListener("click", async () => {
       const checked = (row.querySelector(".set-done") as HTMLInputElement).checked;
       if (checked && preset.sets[i]) {
         const weight = parseFloat((row.querySelector(".input-weight") as HTMLInputElement).value) || 0;
-        sets.push({ weight, reps: preset.sets[i].reps });
+        const repsInput = row.querySelector(".input-reps") as HTMLInputElement | null;
+        const repsValue = repsInput ? parseInt(repsInput.value, 10) : preset.sets[i].reps;
+        const reps = Number.isFinite(repsValue) && repsValue > 0 ? repsValue : preset.sets[i].reps;
+        sets.push({ weight, reps });
       }
     });
 
