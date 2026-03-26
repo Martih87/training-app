@@ -1,5 +1,3 @@
-/* ── Recommendations page styles ─────────────── */
-
 .week-card {
   text-align: center;
 }
@@ -8,95 +6,122 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.7rem;
 }
 
 .week-nav h2 {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .week-nav .btn:disabled {
-  opacity: 0.3;
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
 .week-range {
-  font-size: 1.1rem;
-  color: #5b8def;
-  font-weight: 600;
-  margin-top: 0.25rem;
+  font-size: 1rem;
+  color: #77cec7;
+  font-weight: 700;
+  margin-top: 0.2rem;
 }
 
-/* ── Muscle group rows ───────────────────────── */
 .muscle-group-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
 .mg-row {
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
+  background: #1a2330;
+  border: 1px solid rgba(183, 201, 221, 0.18);
+  border-radius: 13px;
+  padding: 0.85rem 0.95rem;
 }
 
 .mg-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  gap: 0.6rem;
+  margin-bottom: 0.45rem;
 }
 
 .mg-name {
+  font-family: "Barlow", sans-serif;
   font-size: 1rem;
-  font-weight: 600;
-  color: #e0e0e0;
+  font-weight: 700;
+  color: #e6eff8;
 }
 
 .mg-level {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.24rem 0.56rem;
+  border-radius: 999px;
+  font-weight: 700;
 }
 
-.level-badge-below-beginner { background: #4a1c1c; color: #e74c3c; }
-.level-badge-beginner        { background: #2d3a1e; color: #a3d977; }
-.level-badge-intermediate    { background: #1e3a3a; color: #5bc0de; }
-.level-badge-pro             { background: #3a2e1e; color: #f0ad4e; }
+.level-badge-below-beginner {
+  background: rgba(191, 47, 49, 0.22);
+  color: #ff9fa0;
+}
 
-/* ── Progress bar ────────────────────────────── */
+.level-badge-beginner {
+  background: rgba(89, 165, 107, 0.22);
+  color: #9ce8b0;
+}
+
+.level-badge-intermediate {
+  background: rgba(31, 143, 138, 0.22);
+  color: #8ce4de;
+}
+
+.level-badge-pro {
+  background: rgba(239, 106, 47, 0.22);
+  color: #ffc099;
+}
+
 .mg-bar-container {
   position: relative;
-  height: 22px;
-  background: #1a1a1a;
-  border-radius: 4px;
+  height: 24px;
+  background: #141d27;
+  border: 1px solid rgba(183, 201, 221, 0.16);
+  border-radius: 8px;
   overflow: visible;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
 }
 
 .mg-bar {
   height: 100%;
-  border-radius: 4px;
-  transition: width 0.5s ease;
+  border-radius: 7px;
+  transition: width 0.45s ease;
   min-width: 2px;
 }
 
-.mg-bar-below-beginner { background: #e74c3c; }
-.mg-bar-beginner       { background: #a3d977; }
-.mg-bar-intermediate   { background: linear-gradient(90deg, #a3d977, #5bc0de); }
-.mg-bar-pro            { background: linear-gradient(90deg, #5bc0de, #f0ad4e); }
+.mg-bar-below-beginner {
+  background: linear-gradient(90deg, #bf2f31 0%, #dc595a 100%);
+}
 
-/* Target markers */
+.mg-bar-beginner {
+  background: linear-gradient(90deg, #4ca766 0%, #7bc98f 100%);
+}
+
+.mg-bar-intermediate {
+  background: linear-gradient(90deg, #4ca766 0%, #1f8f8a 100%);
+}
+
+.mg-bar-pro {
+  background: linear-gradient(90deg, #1f8f8a 0%, #ef6a2f 100%);
+}
+
 .mg-marker {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: #555;
+  background: rgba(209, 224, 239, 0.62);
   z-index: 1;
 }
 
@@ -106,27 +131,31 @@
   top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.6rem;
-  color: #666;
+  font-size: 0.58rem;
+  color: #9fb1c5;
 }
 
-.mg-marker-int::after { content: "I"; }
-.mg-marker-pro::after { content: "P"; }
+.mg-marker-int::after {
+  content: "I";
+}
+
+.mg-marker-pro::after {
+  content: "P";
+}
 
 .mg-stats {
-  font-size: 0.8rem;
-  color: #888;
+  font-size: 0.79rem;
+  color: #a8b8c8;
   text-align: right;
 }
 
 .mg-examples {
-  font-size: 0.75rem;
-  color: #666;
-  margin-top: 0.25rem;
+  font-size: 0.73rem;
+  color: #8ea0b4;
+  margin-top: 0.28rem;
   font-style: italic;
 }
 
-/* ── Improvement items ───────────────────────── */
 .improvement-list {
   display: flex;
   flex-direction: column;
@@ -134,36 +163,66 @@
 }
 
 .improvement-item {
-  background: #2d1f1f;
-  border: 1px solid #4a2a2a;
-  border-radius: 8px;
-  padding: 0.65rem 0.85rem;
-  font-size: 0.9rem;
-  color: #e8c8c8;
+  background: rgba(239, 106, 47, 0.12);
+  border: 1px solid rgba(239, 106, 47, 0.38);
+  border-radius: 10px;
+  padding: 0.6rem 0.78rem;
+  font-size: 0.88rem;
+  color: #ffc6a3;
 }
 
-/* ── Level legend ────────────────────────────── */
 .level-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .level-item {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.85rem;
-  color: #aaa;
+  font-size: 0.84rem;
+  color: #a8b8c8;
 }
 
 .level-dot {
   width: 14px;
   height: 14px;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
-.level-below        { background: #e74c3c; }
-.level-beginner     { background: #a3d977; }
-.level-intermediate { background: #5bc0de; }
-.level-pro          { background: #f0ad4e; }
+.level-below {
+  background: #bf2f31;
+}
+
+.level-beginner {
+  background: #4ca766;
+}
+
+.level-intermediate {
+  background: #1f8f8a;
+}
+
+.level-pro {
+  background: #ef6a2f;
+}
+
+@media (max-width: 640px) {
+  .week-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .week-nav .btn {
+    width: 100%;
+  }
+
+  .mg-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mg-stats {
+    text-align: left;
+  }
+}
