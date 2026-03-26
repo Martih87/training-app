@@ -27,10 +27,15 @@ fi
 
 echo "✅ Logged in as: $(flyctl auth whoami)"
 
-# 3. Launch app (creates the app on Fly, skips deploy)
+# 3. Launch app only if it doesn't already exist
+APP_NAME="$(grep -E "^app = " fly.toml | head -1 | sed -E "s/app = '(.*)'/\\1/")"
 echo ""
-echo "🛫 Creating app on Fly.io..."
-flyctl launch --no-deploy --copy-config --yes
+if flyctl apps list | awk '{print $1}' | grep -qx "$APP_NAME"; then
+  echo "ℹ️  App '$APP_NAME' already exists. Skipping flyctl launch."
+else
+  echo "🛫 Creating app '$APP_NAME' on Fly.io..."
+  flyctl launch --name "$APP_NAME" --no-deploy --copy-config --yes
+fi
 
 # 4. Create persistent volume for SQLite
 echo ""
