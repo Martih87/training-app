@@ -4,3 +4,5 @@ data/
 public/app.js
 public/admin.js
 .env
+
+.codex/config.toml
