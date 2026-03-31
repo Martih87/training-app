@@ -20,8 +20,8 @@
 }
 
 .week-range {
-  font-size: 1rem;
-  color: #77cec7;
+  font-size: 0.86rem;
+  color: #8ec0ff;
   font-weight: 700;
   margin-top: 0.2rem;
 }
@@ -33,10 +33,10 @@
 }
 
 .mg-row {
-  background: #1a2330;
-  border: 1px solid rgba(183, 201, 221, 0.18);
-  border-radius: 13px;
-  padding: 0.85rem 0.95rem;
+  background: #111d2d;
+  border: 1px solid rgba(235, 100, 15, 0.35);
+  border-radius: 9px;
+  padding: 0.72rem 0.85rem;
 }
 
 .mg-header {
@@ -48,8 +48,7 @@
 }
 
 .mg-name {
-  font-family: "Barlow", sans-serif;
-  font-size: 1rem;
+  font-size: 0.93rem;
   font-weight: 700;
   color: #e6eff8;
 }
@@ -64,31 +63,31 @@
 }
 
 .level-badge-below-beginner {
-  background: rgba(191, 47, 49, 0.22);
-  color: #ff9fa0;
+  background: rgba(235, 100, 15, 0.26);
+  color: #ffd0af;
 }
 
 .level-badge-beginner {
-  background: rgba(89, 165, 107, 0.22);
-  color: #9ce8b0;
+  background: rgba(46, 214, 226, 0.2);
+  color: #a2f2f7;
 }
 
 .level-badge-intermediate {
-  background: rgba(31, 143, 138, 0.22);
-  color: #8ce4de;
+  background: rgba(46, 214, 226, 0.2);
+  color: #a2f2f7;
 }
 
 .level-badge-pro {
-  background: rgba(239, 106, 47, 0.22);
-  color: #ffc099;
+  background: rgba(46, 214, 226, 0.2);
+  color: #a2f2f7;
 }
 
 .mg-bar-container {
   position: relative;
-  height: 24px;
-  background: #141d27;
-  border: 1px solid rgba(183, 201, 221, 0.16);
-  border-radius: 8px;
+  height: 10px;
+  background: #0f1927;
+  border: 1px solid rgba(56, 136, 210, 0.3);
+  border-radius: 4px;
   overflow: visible;
   margin-bottom: 0.35rem;
 }
@@ -101,19 +100,19 @@
 }
 
 .mg-bar-below-beginner {
-  background: linear-gradient(90deg, #bf2f31 0%, #dc595a 100%);
+  background: linear-gradient(90deg, #ff8f32 0%, #2ee4ec 100%);
 }
 
 .mg-bar-beginner {
-  background: linear-gradient(90deg, #4ca766 0%, #7bc98f 100%);
+  background: linear-gradient(90deg, #ff8f32 0%, #2ee4ec 100%);
 }
 
 .mg-bar-intermediate {
-  background: linear-gradient(90deg, #4ca766 0%, #1f8f8a 100%);
+  background: linear-gradient(90deg, #ff8f32 0%, #2ee4ec 100%);
 }
 
 .mg-bar-pro {
-  background: linear-gradient(90deg, #1f8f8a 0%, #ef6a2f 100%);
+  background: linear-gradient(90deg, #ff8f32 0%, #2ee4ec 100%);
 }
 
 .mg-marker {
@@ -121,36 +120,28 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: rgba(209, 224, 239, 0.62);
+  background: rgba(174, 197, 221, 0.72);
   z-index: 1;
 }
 
 .mg-marker::after {
-  content: "B";
+  content: "";
   position: absolute;
-  top: -14px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.58rem;
   color: #9fb1c5;
 }
 
-.mg-marker-int::after {
-  content: "I";
-}
-
-.mg-marker-pro::after {
-  content: "P";
-}
-
 .mg-stats {
-  font-size: 0.79rem;
+  font-size: 0.72rem;
   color: #a8b8c8;
   text-align: right;
 }
 
 .mg-examples {
-  font-size: 0.73rem;
+  font-size: 0.68rem;
   color: #8ea0b4;
   margin-top: 0.28rem;
   font-style: italic;
@@ -164,11 +155,11 @@
 
 .improvement-item {
   background: rgba(239, 106, 47, 0.12);
-  border: 1px solid rgba(239, 106, 47, 0.38);
-  border-radius: 10px;
-  padding: 0.6rem 0.78rem;
-  font-size: 0.88rem;
-  color: #ffc6a3;
+  border: 1px solid rgba(239, 106, 47, 0.32);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.76rem;
+  color: #ffccab;
 }
 
 .level-legend {

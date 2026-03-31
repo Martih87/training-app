@@ -6,56 +6,64 @@
   <title>LightWeight!</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="log-page">
   <div class="container">
-    <header>
-      <div>
-        <h1>🔥 LightWeight!</h1>
-        <span class="back-link" id="user-info"></span>
-      </div>
+    <header class="logger-top">
       <div class="header-actions">
-        <a href="/recommendations.html" class="btn btn-secondary btn-sm">📈 Recs</a>
-        <a href="/admin.html" class="btn btn-secondary btn-sm">📊 History</a>
+        <a href="/recommendations.html" class="btn btn-secondary btn-sm">Recs</a>
+        <a href="/admin.html" class="btn btn-secondary btn-sm">History</a>
         <button class="btn btn-secondary btn-sm" onclick="signOut()">Sign out</button>
+      </div>
+      <div class="brand-wrap">
+        <div class="brand-eye">
+          <img src="/logo-eye-top.svg" alt="LightWeight dragon eye logo" />
+        </div>
+        <div class="brand-copy">
+          <h1>LightWeight!</h1>
+          <span class="back-link" id="user-info"></span>
+        </div>
       </div>
     </header>
 
-    <!-- DATE PICKER -->
-    <section class="card date-card">
-      <label for="session-date">Session Date</label>
-      <input type="date" id="session-date" />
-    </section>
+    <section class="card logger-card">
+      <h2 class="logger-title">Log Session</h2>
 
-    <!-- CORE EXERCISES -->
-    <h3 class="section-label">Core Exercises</h3>
-    <div id="exercise-list"></div>
-
-    <!-- OPTIONAL EXERCISES -->
-    <h3 class="section-label">Optional Exercises</h3>
-    <div id="optional-exercise-list"></div>
-
-    <!-- USER EXERCISES (linked to account) -->
-    <h3 class="section-label">Your Exercises</h3>
-    <div id="user-exercise-list"></div>
-
-    <!-- ADD CUSTOM EXERCISE -->
-    <section class="card add-exercise-card">
-      <h3 class="section-label" style="margin-top:0">Add Exercise</h3>
-      <div class="add-exercise-form">
-        <input type="text" id="add-exercise-name" placeholder="Exercise name" class="input-text" />
-        <div class="add-exercise-defaults">
-          <label>Weight <input type="number" id="add-exercise-weight" value="0" min="0" step="2.5" inputmode="decimal" /></label>
-          <label>Reps <input type="number" id="add-exercise-reps" value="10" min="1" inputmode="numeric" /></label>
-          <label>Sets <input type="number" id="add-exercise-sets" value="3" min="1" max="10" inputmode="numeric" /></label>
-        </div>
-        <button id="btn-add-exercise" class="btn btn-secondary">+ Add Exercise</button>
+      <div class="logger-date-row">
+        <label for="session-date">Session date picker</label>
+        <input type="date" id="session-date" />
       </div>
-    </section>
 
-    <!-- SUGGESTIONS -->
-    <section class="card" id="suggestions-section">
-      <h3 class="section-label" style="margin-top:0">Popular with others</h3>
-      <div id="suggestions-list" class="suggestions-list"></div>
+      <!-- CORE EXERCISES -->
+      <h3 class="section-label">Core Exercises</h3>
+      <div id="exercise-list"></div>
+
+      <!-- OPTIONAL EXERCISES -->
+      <h3 class="section-label">Optional Exercises</h3>
+      <div id="optional-exercise-list"></div>
+
+      <!-- USER EXERCISES (linked to account) -->
+      <h3 class="section-label">Your Exercises</h3>
+      <div id="user-exercise-list"></div>
+
+      <!-- ADD CUSTOM EXERCISE -->
+      <section class="card add-exercise-card">
+        <h3 class="section-label" style="margin-top:0">Add Exercise</h3>
+        <div class="add-exercise-form">
+          <input type="text" id="add-exercise-name" placeholder="Exercise name" class="input-text" />
+          <div class="add-exercise-defaults">
+            <label>Weight <input type="number" id="add-exercise-weight" value="0" min="0" step="2.5" inputmode="decimal" /></label>
+            <label>Reps <input type="number" id="add-exercise-reps" value="10" min="1" inputmode="numeric" /></label>
+            <label>Sets <input type="number" id="add-exercise-sets" value="3" min="1" max="10" inputmode="numeric" /></label>
+          </div>
+          <button id="btn-add-exercise" class="btn btn-secondary">+ Add Exercise</button>
+        </div>
+      </section>
+
+      <!-- SUGGESTIONS -->
+      <section class="card" id="suggestions-section">
+        <h3 class="section-label" style="margin-top:0">Popular with others</h3>
+        <div id="suggestions-list" class="suggestions-list"></div>
+      </section>
     </section>
 
     <!-- SAVE (sticky bottom) -->
